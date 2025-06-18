@@ -3,16 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>QA Bot</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/style.css') }}">
 </head>
 <body>
-    <h1>質問してください</h1>
-    <form id="qa-form">
-        <input type="text" id="question" name="question" required>
-        <button type="submit">送信</button>
-    </form>
-    <div id="answer"></div>
+    <div class="main-container">
+        <h1>質問してください</h1>
+        <form id="qa-form">
+            <input type="text" id="question" name="question" required>
+            <button type="submit">送信</button>
+        </form>
+        <div id="answer"></div>
+        <div id="history"></div>
+    </div>
     <script>
+    const historyDiv = document.getElementById('history');
+    const answerDiv = document.getElementById('answer');
+    let history = [];
+
     document.getElementById('qa-form').addEventListener('submit', async function(e) {
         e.preventDefault();
         const question = document.getElementById('question').value;
@@ -22,8 +29,31 @@
             body: JSON.stringify({question})
         });
         const data = await res.json();
-        document.getElementById('answer').textContent = data.answer;
+        answerDiv.textContent = data.answer;
+
+        // 履歴に追加
+        history.push({q: question, a: data.answer});
+        renderHistory();
+        document.getElementById('question').value = '';
     });
+
+    function renderHistory() {
+        historyDiv.innerHTML = '';
+        // 最新が上に来るように逆順で表示
+        history.slice().reverse().forEach(item => {
+            const qDiv = document.createElement('div');
+            qDiv.className = 'history-q';
+            qDiv.textContent = 'Q: ' + item.q;
+            const aDiv = document.createElement('div');
+            aDiv.className = 'history-a';
+            aDiv.textContent = 'A: ' + item.a;
+            const wrap = document.createElement('div');
+            wrap.className = 'history-item';
+            wrap.appendChild(qDiv);
+            wrap.appendChild(aDiv);
+            historyDiv.appendChild(wrap);
+        });
+    }
     </script>
 </body>
 </html>
