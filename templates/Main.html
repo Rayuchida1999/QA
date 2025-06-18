@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>QA Bot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h1>質問してください</h1>
+    <form id="qa-form">
+        <input type="text" id="question" name="question" required>
+        <button type="submit">送信</button>
+    </form>
+    <div id="answer"></div>
+    <script>
+    document.getElementById('qa-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const question = document.getElementById('question').value;
+        const res = await fetch('/ask', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({question})
+        });
+        const data = await res.json();
+        document.getElementById('answer').textContent = data.answer;
+    });
+    </script>
+</body>
+</html>

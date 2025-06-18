@@ -1,0 +1,11 @@
+body {
+    font-family: sans-serif;
+    margin: 2em;
+}
+#qa-form {
+    margin-bottom: 1em;
+}
+#answer {
+    margin-top: 1em;
+    font-weight: bold;
+}
