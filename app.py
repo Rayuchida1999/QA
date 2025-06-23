@@ -40,7 +40,7 @@ def ask():
         answer = dict_bot(question)
         if answer == "すみません、その質問にはまだ対応していません。":
             try:
-                response = openai.ChatCompletion.create(
+                response = openai.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=[
                         {"role": "system", "content": "あなたは親切なQAアシスタントです。"},
@@ -49,7 +49,7 @@ def ask():
                     temperature=0.7,
                     max_tokens=1000
                 )
-                answer = response['choices'][0]['message']['content'].strip()
+                answer = response.choices[0].message.content.strip()
             except Exception as e:
                 answer = f"エラーが発生しました: {str(e)}"
 
