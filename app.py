@@ -25,11 +25,6 @@ def init_db():
     conn.commit()
     conn.close()
 
-@app.before_first_request
-def init_app():
-    print("アプリケーションが最初のリクエストを受け取る前に実行されます")
-    init_db()
-
 @app.route('/')
 def home():
     return render_template('Main.html')
@@ -76,4 +71,7 @@ def get_history():
     return jsonify({'history': history})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    # セキュリティ警告: この開発サーバは本番環境で使用しないでください。
+    # 本番運用時はgunicornやuwsgiなどのWSGIサーバを利用してください。
+    init_db()  # サーバ起動前にDB初期化
+    app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False)
