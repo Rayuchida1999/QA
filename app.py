@@ -7,7 +7,7 @@ from question import dict_bot
 app = Flask(__name__, static_folder='static', template_folder='templates')
 
 # Render.comでは環境変数で管理
-openai.api_key = os.getenv("OPENAI_API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 DB_PATH = 'qa_history.db'
 
@@ -40,15 +40,15 @@ def ask():
         answer = dict_bot(question)
         if answer == "すみません、その質問にはまだ対応していません。":
             try:
-                response = openai.chat.completions.create(
+                client = openai.OpenAI(api_key=OPENAI_API_KEY)
+                response = client.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=[
                         {"role": "system", "content": "あなたは親切なQAアシスタントです。"},
                         {"role": "user", "content": question}
                     ],
                     temperature=0.7,
-                    max_tokens=1000,
-                    api_key=openai.api_key  # 追加
+                    max_tokens=1000
                 )
                 answer = response.choices[0].message.content.strip()
             except Exception as e:
