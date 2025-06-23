@@ -8,7 +8,7 @@ qa_db = {
 }
     
 def dict_bot(question):
-    q = question.strip().lower()
+    q = question.strip()
     # 完全一致をまず探す
     if q in qa_db:
         return qa_db[q]
