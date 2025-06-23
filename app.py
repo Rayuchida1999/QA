@@ -31,6 +31,7 @@ def home():
 
 @app.route('/ask', methods=['POST'])
 def ask():
+    init_db()  # 追加: テーブルがなければ作成
     try:
         data = request.get_json()
         question = data.get('question')
@@ -60,11 +61,11 @@ def ask():
         conn.close()
         return jsonify({'answer': answer})
     except Exception as e:
-        # ここでエラー内容を返す
         return jsonify({'answer': f"サーバー側でエラーが発生しました: {str(e)}"}), 500
 
 @app.route('/history', methods=['GET'])
 def get_history():
+    init_db()  # 追加: テーブルがなければ作成
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute('SELECT question, answer FROM history ORDER BY id DESC LIMIT 20')
