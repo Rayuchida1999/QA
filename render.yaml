@@ -7,3 +7,5 @@ services:
     envVars:
       - key: OPENAI_API_KEY
         sync: false # Renderダッシュボードで直接追加するならfalseに
+      - key: PYTHON_VERSION
+        value: 3.10

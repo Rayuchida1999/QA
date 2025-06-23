@@ -26,7 +26,8 @@ def init_db():
     conn.close()
 
 @app.before_first_request
-def setup():
+def init_app():
+    print("アプリケーションが最初のリクエストを受け取る前に実行されます")
     init_db()
 
 @app.route('/')
