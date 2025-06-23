@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, jsonify
 import openai
 import os
 import sqlite3
-from quetion import dict_bot  # 追加
+from question import dict_bot
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 
