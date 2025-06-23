@@ -1,13 +1,14 @@
 from flask import Flask, request, render_template, jsonify
-import openai
 import os
 import sqlite3
+import requests
 from question import dict_bot
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 
-# Render.comでは環境変数で管理
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+GROQ_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
 
 DB_PATH = 'qa_history.db'
 
@@ -40,19 +41,27 @@ def ask():
         answer = dict_bot(question)
         if answer == "すみません、その質問にはまだ対応していません。":
             try:
-                client = openai.OpenAI(api_key=OPENAI_API_KEY)
-                response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=[
+                headers = {
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {GROQ_API_KEY}"
+                }
+                payload = {
+                    "model": GROQ_MODEL,
+                    "messages": [
                         {"role": "system", "content": "あなたは親切なQAアシスタントです。"},
                         {"role": "user", "content": question}
                     ],
-                    temperature=0.7,
-                    max_tokens=1000
-                )
-                answer = response.choices[0].message.content.strip()
+                    "temperature": 0.7,
+                    "max_tokens": 1000
+                }
+                response = requests.post(GROQ_API_URL, headers=headers, json=payload, timeout=30)
+                if response.status_code == 200:
+                    groq_data = response.json()
+                    answer = groq_data["choices"][0]["message"]["content"].strip()
+                else:
+                    answer = f"Groq APIエラー: {response.status_code} - {response.text}"
             except Exception as e:
-                answer = f"エラーが発生しました: {str(e)}"
+                answer = f"Groq API通信エラー: {str(e)}"
 
         # DBに保存
         conn = sqlite3.connect(DB_PATH)
