@@ -31,33 +31,37 @@ def home():
 
 @app.route('/ask', methods=['POST'])
 def ask():
-    data = request.get_json()
-    question = data.get('question')
+    try:
+        data = request.get_json()
+        question = data.get('question')
 
-    # まずローカルQ&Aで回答を試みる
-    answer = dict_bot(question)
-    if answer == "すみません、その質問にはまだ対応していません。":
-        try:
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "あなたは親切なQAアシスタントです。"},
-                    {"role": "user", "content": question}
-                ],
-                temperature=0.7,
-                max_tokens=1000
-            )
-            answer = response['choices'][0]['message']['content'].strip()
-        except Exception as e:
-            answer = f"エラーが発生しました: {str(e)}"
+        # まずローカルQ&Aで回答を試みる
+        answer = dict_bot(question)
+        if answer == "すみません、その質問にはまだ対応していません。":
+            try:
+                response = openai.ChatCompletion.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role": "system", "content": "あなたは親切なQAアシスタントです。"},
+                        {"role": "user", "content": question}
+                    ],
+                    temperature=0.7,
+                    max_tokens=1000
+                )
+                answer = response['choices'][0]['message']['content'].strip()
+            except Exception as e:
+                answer = f"エラーが発生しました: {str(e)}"
 
-    # DBに保存
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('INSERT INTO history (question, answer) VALUES (?, ?)', (question, answer))
-    conn.commit()
-    conn.close()
-    return jsonify({'answer': answer})
+        # DBに保存
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute('INSERT INTO history (question, answer) VALUES (?, ?)', (question, answer))
+        conn.commit()
+        conn.close()
+        return jsonify({'answer': answer})
+    except Exception as e:
+        # ここでエラー内容を返す
+        return jsonify({'answer': f"サーバー側でエラーが発生しました: {str(e)}"}), 500
 
 @app.route('/history', methods=['GET'])
 def get_history():
