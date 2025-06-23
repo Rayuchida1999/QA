@@ -47,7 +47,8 @@ def ask():
                         {"role": "user", "content": question}
                     ],
                     temperature=0.7,
-                    max_tokens=1000
+                    max_tokens=1000,
+                    api_key=openai.api_key  # 追加
                 )
                 answer = response.choices[0].message.content.strip()
             except Exception as e:
