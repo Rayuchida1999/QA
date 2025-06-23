@@ -29,8 +29,7 @@
             body: JSON.stringify({question})
         });
         const data = await res.json();
-        // \nを<br>に変換してHTMLとして表示
-        answerDiv.innerHTML = data.answer.replace(/\n/g, '<br>');
+        answerDiv.textContent = data.answer;
 
         // 履歴に追加
         history.push({q: question, a: data.answer});
@@ -47,8 +46,7 @@
             qDiv.textContent = 'Q: ' + item.q;
             const aDiv = document.createElement('div');
             aDiv.className = 'history-a';
-            // \nを<br>に変換してHTMLとして表示
-            aDiv.innerHTML = 'A: ' + item.a.replace(/\n/g, '<br>');
+            aDiv.textContent = 'A: ' + item.a;
             const wrap = document.createElement('div');
             wrap.className = 'history-item';
             wrap.appendChild(qDiv);
