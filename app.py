@@ -27,7 +27,7 @@ def init_db():
 
 @app.route('/')
 def home():
-    return render_template('templates/Main.html')
+    return render_template('Main.html')
 
 @app.route('/ask', methods=['POST'])
 def ask():
