@@ -1,6 +1,9 @@
 services:
   - type: web
-    name: flask-app
+    name: qa-app
     env: python
-    buildCommand: ""
-    startCommand: gunicorn main:app
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false # Renderダッシュボードで直接追加するならfalseに
