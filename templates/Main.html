@@ -31,6 +31,10 @@
     document.getElementById('qa-form').addEventListener('submit', async function(e) {
         e.preventDefault();
         const question = document.getElementById('question').value;
+        await sendQuestion(question);
+    });
+
+    async function sendQuestion(question) {
         try {
             const res = await fetch('/ask', {
                 method: 'POST',
@@ -38,12 +42,10 @@
                 body: JSON.stringify({question})
             });
             if (!res.ok) {
-                // サーバーエラー時はテキストとして内容を取得し表示
                 const errorText = await res.text();
                 answerDiv.textContent = 'サーバーエラー: ' + errorText;
                 return;
             }
-            // JSONでない場合のエラーもキャッチ
             let data;
             try {
                 data = await res.json();
@@ -51,15 +53,36 @@
                 answerDiv.textContent = 'レスポンスが不正です（JSONでありません）';
                 return;
             }
+
+            // サジェスト形式の場合
+            if (typeof data.answer === "object" && data.answer && data.answer.__suggest__) {
+                answerDiv.innerHTML = "もしかして:<br>";
+                data.answer.__suggest__.forEach(suggest => {
+                    const btn = document.createElement('button');
+                    btn.textContent = suggest;
+                    btn.type = "button";
+                    btn.onclick = async () => {
+                        // ボタン押下時に自動送信
+                        await sendQuestion(suggest);
+                    };
+                    answerDiv.appendChild(btn);
+                    answerDiv.appendChild(document.createElement('br'));
+                });
+                // 履歴には質問のみ追加
+                history.push({q: question, a: "候補を表示"});
+                renderHistory();
+                document.getElementById('question').value = '';
+                return;
+            }
+
             answerDiv.textContent = data.answer;
-            // 履歴に追加
             history.push({q: question, a: data.answer});
             renderHistory();
             document.getElementById('question').value = '';
         } catch (err) {
             answerDiv.textContent = '質問の送信に失敗しました: ' + err.message;
         }
-    });
+    }
 
     function renderHistory() {
         historyDiv.innerHTML = '';
