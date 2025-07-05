@@ -39,6 +39,15 @@ def ask():
 
         # まずローカルQ&Aで回答を試みる
         answer = dict_bot(question)
+        # 画像付き回答の場合
+        if isinstance(answer, dict) and "text" in answer and "image" in answer:
+            # DBに保存（テキストのみ）
+            conn = sqlite3.connect(DB_PATH)
+            c = conn.cursor()
+            c.execute('INSERT INTO history (question, answer) VALUES (?, ?)', (question, answer["text"]))
+            conn.commit()
+            conn.close()
+            return jsonify({'answer': answer["text"], 'image': answer["image"]})
         if answer == "すみません、その質問にはまだ対応していません。":
             try:
                 headers = {

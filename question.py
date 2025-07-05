@@ -1,21 +1,19 @@
-qa_db = {
-    "こんにちは": "こんにちは！ご質問ありがとうございます。",
-    "あなたは誰ですか": "私はQAボットです。",
-    "pythonとは": "Pythonは人気のあるプログラミング言語です。",
-    "何ができ": "私は質問に答えたり、情報を提供したりできますよ！",
-    "ログインボタンはどこにありますか": "ホーム画面の右上に配置されています。",
-    "ipad右上に通信不可": "わかりました！それぞれ試してください。<br> 1. まず物理的にコードが抜けていないか確認してみましょう。<br> 2.次にパソコンのハローキティソフトを一度落として立ち上げ直して下さい。<br> 3.iPadのコードを抜き差ししてみて下さい。<br> 4.iPadに繋がっているコードの中で延長コードが悪さをすることがあります。延長コードを無くして直接、ハブとiPadを繋いでみて下さい <br> 5.パソコン、iPadの再起動を試してみて下さい。<br> 6.iPadがかなり冷えている場合は温める。",
-}
+from qa_db import qa_db
+
 
 def dict_bot(question):
     q = question.strip()
     # 完全一致
     if q in qa_db:
+        if q == "ipad右上に通信不可":
+            return {
+                "text": qa_db[q],
+                "image": "photo/1.jpg"
+            }
         return qa_db[q]
     # 部分一致候補をリストアップ
     candidates = [key for key in qa_db if key in q or q in key]
     if candidates:
         # ボタン候補をJSON風文字列で返す
         return {"__suggest__": candidates}
-    return "すみません、その質問にはまだ対応していません。"
     return "すみません、その質問にはまだ対応していません。"
